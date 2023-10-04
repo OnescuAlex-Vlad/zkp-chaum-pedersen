@@ -1,4 +1,5 @@
-use num_bigint::BigUint;
+use num_bigint::{BigUint, RandBigInt};
+
 
 pub fn exponentiate(num: &BigUint, exponent: &BigUint, modulus: &BigUint) -> BigUint {
     num.modpow(exponent, modulus)
@@ -27,6 +28,12 @@ pub fn verify(
     let cond2 = *r2 == (beta.modpow(s, p) * y2.modpow(c, p)).modpow(&BigUint::from(1u32), &p);
 
     cond1 && cond2
+}
+
+pub fn generate_random(limit: &BigUint) -> BigUint {
+    let mut rng = rand::thread_rng();
+
+    rng.gen_biguint_below(limit)
 }
 
 #[cfg(test)]
@@ -59,6 +66,30 @@ mod test {
 
         let s = solve(&k, &c, &x, &q);
         assert_eq!(s, BigUint::from(5u32));
+
+        let res = verify(&r1, &r2, &y1, &y2, &alpha, &beta, &c, &s, &p);
+        assert!(res);
+    }
+
+    #[test]
+    fn test_random() {
+        let alpha = BigUint::from(4u32);
+        let beta = BigUint::from(9u32);
+        let p = BigUint::from(23u32);
+        let q = BigUint::from(11u32);
+
+        let x = BigUint::from(6u32);
+        let k = generate_random(&q);
+
+        let c = generate_random(&q);
+
+        let y1 = exponentiate(&alpha, &x, &p);
+        let y2 = exponentiate(&beta, &x, &p);
+
+        let r1 = exponentiate(&alpha, &k, &p);
+        let r2 = exponentiate(&beta, &k, &p);
+
+        let s = solve(&k, &c, &x, &q);
 
         let res = verify(&r1, &r2, &y1, &y2, &alpha, &beta, &c, &s, &p);
         assert!(res);
