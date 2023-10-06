@@ -12,6 +12,7 @@ tonic = "0.10.2"
 hex = "0.4.3"
 prost = "0.12.1"
 tokio = { version = "1.32.0", features = ["macros", "rt-multi-thread"]}
+num-traits = "0.2.16"
 
 [build-dependencies]
 tonic-build = "0.10.2"
